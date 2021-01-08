@@ -16,8 +16,11 @@ lex.yy.o: lex.yy.c y.tab.h
 y.tab.o: y.tab.c
 	gcc -c y.tab.c 
 
-principal: lex.yy.o y.tab.o y.tab.h
-	gcc lex.yy.o y.tab.o -o term -lm
+pila.o: pila.c
+	gcc -c pila.c
+
+principal: lex.yy.o y.tab.o y.tab.h pila.o 
+	gcc lex.yy.o y.tab.o pila.o -o term -lm
 
 clean: 
 	rm y.tab.h lex.yy.c y.tab.c y.tab.o lex.yy.o

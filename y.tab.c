@@ -26,14 +26,16 @@
     #include <string.h>
     #include <sys/wait.h>
     #include "defs.h"
+    #include "pila.h"
 
     int yylex();
     void yyerror( char * );
+    void prompt();
     pid_t pid;
-
+    struct pila rutasStack;
     char * parametros [PARAMLIMIT];
     char pcount = 0;
-#line 18 "terminal.y"
+#line 20 "terminal.y"
 #ifdef YYSTYPE
 #undef  YYSTYPE_IS_DECLARED
 #define YYSTYPE_IS_DECLARED 1
@@ -44,7 +46,7 @@ typedef union{
     char *s;
 } YYSTYPE;
 #endif /* !YYSTYPE_IS_DECLARED */
-#line 48 "y.tab.c"
+#line 50 "y.tab.c"
 
 /* compatibility with bison */
 #ifdef YYPARSE_PARAM
@@ -83,39 +85,40 @@ extern int YYPARSE_DECL();
 #define PARAMETRO 260
 #define RMARCH 261
 #define PPARAMS 262
+#define RMDIR 263
 #define YYERRCODE 256
 typedef short YYINT;
 static const YYINT yylhs[] = {                           -1,
     0,    0,    0,    3,    3,    1,    2,    2,    2,    2,
-    2,
+    2,    2,
 };
 static const YYINT yylen[] = {                            2,
     1,    3,    2,    1,    2,    1,    1,    2,    1,    2,
-    2,
+    2,    2,
 };
 static const YYINT yydefred[] = {                         0,
-    0,    0,    9,    0,    0,    0,    0,    8,   10,    6,
-    4,    0,   11,    0,    3,    5,    2,
+    0,    0,    9,    0,    0,    0,    0,    0,    8,   10,
+    6,    4,    0,   11,   12,    0,    3,    5,    2,
 };
-static const YYINT yydgoto[] = {                          6,
-   12,    7,   13,
+static const YYINT yydgoto[] = {                          7,
+   13,    8,   14,
 };
-static const YYINT yysindex[] = {                        -5,
- -258, -256,    0,   -3,    0,    0,  -10,    0,    0,    0,
-    0,   -3,    0,   -5,    0,    0,    0,
+static const YYINT yysindex[] = {                         8,
+ -257, -255,    0,   -8, -254,    0,    0,  -10,    0,    0,
+    0,    0,   -8,    0,    0,    8,    0,    0,    0,
 };
 static const YYINT yyrindex[] = {                         0,
-    0,    0,    0,    0,    1,    0,    0,    0,    0,    0,
-    0,    0,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,    0,    1,    0,    0,    0,    0,
+    0,    0,    0,    0,    0,    0,    0,    0,    0,
 };
 static const YYINT yygindex[] = {                        -4,
     0,    0,   -6,
 };
-#define YYTABLESIZE 262
-static const YYINT yytable[] = {                          5,
-    1,    8,   15,    9,    5,   16,   11,    0,    0,   17,
-    7,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-    0,    0,    0,    0,    0,    0,    0,   14,    0,    0,
+#define YYTABLESIZE 271
+static const YYINT yytable[] = {                          6,
+    1,   12,    9,   17,   10,   15,   18,    0,    0,    0,
+    7,   19,    0,    0,    0,    0,    0,    6,    0,    0,
+    0,    0,    0,    0,    0,    0,    0,   16,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    7,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -138,12 +141,13 @@ static const YYINT yytable[] = {                          5,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    1,    2,    3,    0,
-    4,    1,    2,    3,    0,    4,   10,    7,    7,    7,
-    0,    7,
+    4,   11,    5,    0,    0,    0,    0,    7,    7,    7,
+    0,    7,    0,    7,    1,    2,    3,    0,    4,    0,
+    5,
 };
 static const YYINT yycheck[] = {                         10,
-    0,  260,    7,  260,   10,   12,   10,   -1,   -1,   14,
-   10,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
+    0,   10,  260,    8,  260,  260,   13,   -1,   -1,   -1,
+   10,   16,   -1,   -1,   -1,   -1,   -1,   10,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   38,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   38,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
@@ -167,15 +171,16 @@ static const YYINT yycheck[] = {                         10,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,  257,  258,  259,   -1,
-  261,  257,  258,  259,   -1,  261,  260,  257,  258,  259,
-   -1,  261,
+  261,  260,  263,   -1,   -1,   -1,   -1,  257,  258,  259,
+   -1,  261,   -1,  263,  257,  258,  259,   -1,  261,   -1,
+  263,
 };
-#define YYFINAL 6
+#define YYFINAL 7
 #ifndef YYDEBUG
 #define YYDEBUG 0
 #endif
-#define YYMAXTOKEN 262
-#define YYUNDFTOKEN 268
+#define YYMAXTOKEN 263
+#define YYUNDFTOKEN 269
 #define YYTRANSLATE(a) ((a) > YYMAXTOKEN ? YYUNDFTOKEN : (a))
 #if YYDEBUG
 static const char *const yyname[] = {
@@ -187,7 +192,7 @@ static const char *const yyname[] = {
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"MKDIR","TOUCH","LS",
-"PARAMETRO","RMARCH","PPARAMS",0,0,0,0,0,"illegal-symbol",
+"PARAMETRO","RMARCH","PPARAMS","RMDIR",0,0,0,0,0,"illegal-symbol",
 };
 static const char *const yyrule[] = {
 "$accept : list",
@@ -202,6 +207,7 @@ static const char *const yyrule[] = {
 "cmd : LS",
 "cmd : TOUCH PARAMETRO",
 "cmd : RMARCH plist",
+"cmd : RMDIR PARAMETRO",
 
 };
 #endif
@@ -239,7 +245,7 @@ typedef struct {
 } YYSTACKDATA;
 /* variables for the parser stack */
 static YYSTACKDATA yystack;
-#line 115 "terminal.y"
+#line 137 "terminal.y"
 
 
 void yyerror( char *s ){
@@ -247,9 +253,30 @@ void yyerror( char *s ){
 }
 
 int main(){
+    if( crear(&rutasStack) ){
+        printf("Ok\n");
+    }
+    struct elemento a;
+    strcpy(a.ruta, "Datos");
+    if( push(&rutasStack, a) ){
+        printf("Ok\n");
+    }
+    impPila(&rutasStack);
+    prompt();
     return yyparse();
 }
-#line 253 "y.tab.c"
+
+void prompt(){
+    
+    printf("\e[1;32m");
+    printf("terminal:");
+    printf("\e[0;94m");
+    printf("/");
+    printf("\e[1;32m");
+    printf("$ ");
+    printf("\e[0;97m");
+}
+#line 280 "y.tab.c"
 
 #if YYDEBUG
 #include <stdio.h>		/* needed for printf */
@@ -451,16 +478,32 @@ yyreduce:
         memset(&yyval, 0, sizeof yyval);
     switch (yyn)
     {
+case 1:
+#line 29 "terminal.y"
+	{prompt();}
+break;
+case 2:
+#line 30 "terminal.y"
+	{prompt();}
+break;
+case 3:
+#line 31 "terminal.y"
+	{prompt();}
+break;
 case 5:
-#line 33 "terminal.y"
+#line 35 "terminal.y"
 	{ }
 break;
 case 6:
-#line 36 "terminal.y"
+#line 38 "terminal.y"
 	{   parametros[pcount] = malloc(sizeof(char)* strlen(yystack.l_mark[0].s)); strcpy(parametros[pcount++], yystack.l_mark[0].s); }
 break;
+case 7:
+#line 41 "terminal.y"
+	{prompt();}
+break;
 case 8:
-#line 40 "terminal.y"
+#line 42 "terminal.y"
 	{  yyval.s = yystack.l_mark[-1].s; 
 
                             pid = fork();
@@ -480,7 +523,7 @@ case 8:
                         }
 break;
 case 9:
-#line 57 "terminal.y"
+#line 59 "terminal.y"
 	{   yyval.s = yystack.l_mark[0].s; 
                             pid = fork();
 
@@ -494,7 +537,7 @@ case 9:
                         }
 break;
 case 10:
-#line 68 "terminal.y"
+#line 70 "terminal.y"
 	{
                             yyval.s = yystack.l_mark[-1].s; 
 
@@ -516,7 +559,7 @@ case 10:
                         }
 break;
 case 11:
-#line 87 "terminal.y"
+#line 89 "terminal.y"
 	{
                                 yyval.s = yystack.l_mark[-1].s;
                                 
@@ -545,7 +588,30 @@ case 11:
                                 pid = wait(NULL);
                            }
 break;
-#line 549 "y.tab.c"
+case 12:
+#line 116 "terminal.y"
+	{
+                            yyval.s = yystack.l_mark[-1].s; 
+
+                            pid = fork();
+
+                            if( !pid ){
+                                char *exec[4];
+                                exec[0] = "rm";
+                                exec[1] = "-r";
+                                exec[2] = yystack.l_mark[0].s;
+                                exec[3] = NULL;
+
+                                if( execvp(exec[0], exec) < 0){
+                                    printf("Eror al ejecutar el comando");
+                                }
+                                exit(0);
+                            }
+                            pid = wait(NULL);
+                            
+                        }
+break;
+#line 615 "y.tab.c"
     }
     yystack.s_mark -= yym;
     yystate = *yystack.s_mark;

@@ -8,7 +8,8 @@
 "verArchivos"  { return LS;     }
 "crearArchivo" { return TOUCH;  } 
 "borrarArchivos" { return RMARCH; }
-"lParams" { return PPARAMS; }
+"borrarDirectorio" { return RMDIR; }
+"borrarArchivo" { return RMARCH; }
 [a-zA-Z0-9]+    { yylval.s=yytext; return PARAMETRO; }
 &  {return '&';  }
 \n { return '\n'; }

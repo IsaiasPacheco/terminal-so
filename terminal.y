@@ -6,11 +6,13 @@
     #include <string.h>
     #include <sys/wait.h>
     #include "defs.h"
+    #include "pila.h"
 
     int yylex();
     void yyerror( char * );
+    void prompt();
     pid_t pid;
-
+    struct pila rutasStack;
     char * parametros [PARAMLIMIT];
     char pcount = 0;
 %}
@@ -18,15 +20,15 @@
 %union{
     char *s;
 }
-%token MKDIR TOUCH LS PARAMETRO RMARCH PPARAMS
-%type<s> MKDIR TOUCH LS PARAMETRO RMARCH PPARAMS
+%token MKDIR TOUCH LS PARAMETRO RMARCH PPARAMS RMDIR
+%type<s> MKDIR TOUCH LS PARAMETRO RMARCH PPARAMS RMDIR
 %type<s> param
 %type<s> cmd
 %%
     
-    list: '\n'
-        | cmd '&' list
-        | cmd list
+    list: '\n' {prompt();}
+        | cmd '&' list {prompt();}
+        | cmd list {prompt();}
         ;
     
     plist: '\n'
@@ -36,7 +38,7 @@
     param: PARAMETRO {   parametros[pcount] = malloc(sizeof(char)* strlen($1)); strcpy(parametros[pcount++], $1); }
         ;
 
-    cmd: '\n'
+    cmd: '\n' {prompt();}
         |MKDIR PARAMETRO {  $$ = $1; 
 
                             pid = fork();
@@ -111,6 +113,26 @@
                                 }
                                 pid = wait(NULL);
                            }
+        | RMDIR PARAMETRO {
+                            $$ = $1; 
+
+                            pid = fork();
+
+                            if( !pid ){
+                                char *exec[4];
+                                exec[0] = "rm";
+                                exec[1] = "-r";
+                                exec[2] = $2;
+                                exec[3] = NULL;
+
+                                if( execvp(exec[0], exec) < 0){
+                                    printf("Eror al ejecutar el comando");
+                                }
+                                exit(0);
+                            }
+                            pid = wait(NULL);
+                            
+                        }
 
 %%
 
@@ -119,5 +141,26 @@ void yyerror( char *s ){
 }
 
 int main(){
+    if( crear(&rutasStack) ){
+        printf("Ok\n");
+    }
+    struct elemento a;
+    strcpy(a.ruta, "Datos");
+    if( push(&rutasStack, a) ){
+        printf("Ok\n");
+    }
+    impPila(&rutasStack);
+    prompt();
     return yyparse();
+}
+
+void prompt(){
+    
+    printf("\e[1;32m");
+    printf("terminal:");
+    printf("\e[0;94m");
+    printf("/");
+    printf("\e[1;32m");
+    printf("$ ");
+    printf("\e[0;97m");
 }
