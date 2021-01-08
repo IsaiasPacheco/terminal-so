@@ -25,7 +25,8 @@
 %%
     
     list: '\n'
-        | list cmd
+        | cmd '&' list
+        | cmd list
         ;
     
     plist: '\n'
@@ -53,7 +54,7 @@
                             }
                             pid = wait(NULL);
                         }
-        | LS    '\n'        {   $$ = $1; 
+        | LS            {   $$ = $1; 
                             pid = fork();
 
                             if( !pid ){

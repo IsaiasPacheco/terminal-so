@@ -10,6 +10,7 @@
 "borrarArchivos" { return RMARCH; }
 "lParams" { return PPARAMS; }
 [a-zA-Z0-9]+    { yylval.s=yytext; return PARAMETRO; }
+&  {return '&';  }
 \n { return '\n'; }
 [ \t]   ; /*Ignora espacios en blanco y saltos de linea*/
 .       printf("Erro de caracter");
